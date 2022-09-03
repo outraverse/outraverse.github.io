@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Outraverse</title>
+  
+  <subtitle>Outraverse Blog</subtitle>
+  <link href="http://example.com/atom.xml" rel="self"/>
+  
+  <link href="http://example.com/"/>
+  <updated>2022-09-03T04:25:04.837Z</updated>
+  <id>http://example.com/</id>
+  
+  <author>
+    <name>Xiang Tan</name>
+    
+  </author>
+  
+  <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>First Blog in Outraverse</title>
+    <link href="http://example.com/2022/09/02/first-blog-in-Outraverse/"/>
+    <id>http://example.com/2022/09/02/first-blog-in-Outraverse/</id>
+    <published>2022-09-03T03:34:21.000Z</published>
+    <updated>2022-09-03T04:25:04.837Z</updated>
+    
+    <content type="html"><![CDATA[<p>Hello! This is my very first post in the Outraverse blog site.</p><p>I am a person, who has been in the IT field for too long. May recent years of day job got me into programming side of the IT career; and I have been assisting several groups with their web development projects. </p><p>However, the service has been migrated into a bigger organization and I don’t want to abandon all the customers, now my friends. This is the time I decided to make my own small entity, Outraverse, to continue my work with these projects. Not to mention my passion with Web 3.0 and blockchain technology, I really need to create my own workplace for all that fun stuff.</p><p>How knew, once a hobby of my, now turned into a side business. And this blog will be my journey of the Outraverse.</p><span id="more"></span><p>I don’t want to use WordPress or Drupal; they feel cheap out. During my research on building this blog site, I stump upon Hexo. It works with NodeJS.</p><p>I don’t want to start a war between PHP and JavaScript here. Each programming language has its own strength and weakness. It just “<em><strong>Cool</strong></em>“, but mostly free, to run a site on Github. You know what, it still does sound like I am choosing JS over PHP, let’s forget about both and use Perl…</p><p>Anyway, since this is my first post, let me start with building this blog site with Hexo…</p><p>I read an article about the difference between Jekyll, Hugo and Hexo:</p><blockquote><p><a href="https://www.techiediaries.com/jekyll-hugo-hexo/">https://www.techiediaries.com/jekyll-hugo-hexo/</a></p></blockquote><br />Found that Hexo has speed, Markdown support, etc. The only con the article mentioned was <blockquote><p>Hexo has a relatively large community but the majority is non-English speakers (from China)</p></blockquote><br />As a Chinese Mandarin speaker, I asked myself, what was the con? Guess, not everyone is a bilingual. But it does not bother me. I like the "**blazing fast**" part. As a person, who manages data center, VMware, HPC clusters, performance fits more of my appetite. Therefore, npm this 10 years old system.<p>Installation is fairly simple. </p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># install hexo CLI</span></span><br><span class="line">npm install -g hexo-cli</span><br><span class="line"><span class="comment"># start a hexo project</span></span><br><span class="line">hexo init blog</span><br><span class="line"><span class="comment"># start local server</span></span><br><span class="line">hexo server</span><br></pre></td></tr></table></figure><p>I has already create a site with default theme. Knowing myself, I am going to build a theme from scratch; but for now, I will just clone one. This is the first day, cut me some slack, okay?</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># clone theme repo</span></span><br><span class="line">git <span class="built_in">clone</span> https://github.com/LouisBarranqueiro/hexo-theme-tranquilpeak.git</span><br></pre></td></tr></table></figure><p>After getting the theme in the project repo, it is time to customize. </p><p>Ah, yml files. Meet my old friend from ansible configurations. Updating a couple variables, I believe I have my work on the first day done.</p><p>Oh, one more!</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">npm install hexo-deployer-git</span><br><span class="line">npm install hexo-generator-feed</span><br></pre></td></tr></table></figure><p>Got to have a way to compile and push to Github, right?</p>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;Hello! This is my very first post in the Outraverse blog site.&lt;/p&gt;
+&lt;p&gt;I am a person, who has been in the IT field for too long. May recent years of day job got me into programming side of the IT career; and I have been assisting several groups with their web development projects. &lt;/p&gt;
+&lt;p&gt;However, the service has been migrated into a bigger organization and I don’t want to abandon all the customers, now my friends. This is the time I decided to make my own small entity, Outraverse, to continue my work with these projects. Not to mention my passion with Web 3.0 and blockchain technology, I really need to create my own workplace for all that fun stuff.&lt;/p&gt;
+&lt;p&gt;How knew, once a hobby of my, now turned into a side business. And this blog will be my journey of the Outraverse.&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="General" scheme="http://example.com/categories/General/"/>
+    
+    
+    <category term="Hexo" scheme="http://example.com/tags/Hexo/"/>
+    
+    <category term="Github" scheme="http://example.com/tags/Github/"/>
+    
+  </entry>
+  
+</feed>

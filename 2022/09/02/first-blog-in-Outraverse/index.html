@@ -63,6 +63,10 @@
 
     
         
+            
+<link rel="stylesheet" href="/assets/css/gitalk.css">
+
+        
     
 </head>
 
@@ -408,6 +412,16 @@ As a Chinese Mandarin speaker, I asked myself, what was the con? Guess, not ever
         
         
             
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#gitalk"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
         
         <li class="post-action">
             
@@ -422,6 +436,9 @@ As a Chinese Mandarin speaker, I asked myself, what was the con? Guess, not ever
 
         
         
+            
+                <div id="gitalk"></div>
+
             
         
     </div>
@@ -529,6 +546,16 @@ As a Chinese Mandarin speaker, I asked myself, what was the con? Guess, not ever
             </li>
         
         
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#gitalk"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
             
         
         <li class="post-action">
@@ -648,6 +675,23 @@ As a Chinese Mandarin speaker, I asked myself, what was the con? Guess, not ever
 <!--SCRIPTS END-->
 
 
+    
+        
+<script src="/assets/js/gitalk.js"></script>
+
+        <script type="text/javascript">
+          (function() {
+            new Gitalk({
+              clientID: 'f0b90513862af7a23286',
+              clientSecret: '4c2c3ec636dccc646efa4ba3350bc4baa1c75706',
+              repo: 'blog-gitalk',
+              owner: 'outraverse',
+              admin: ['outraverse'],
+              id: '2022/09/02/first-blog-in-Outraverse/',
+              ...{"language":"en","perPage":10,"distractionFreeMode":false,"enableHotKey":true,"pagerDirection":"first"}
+            }).render('gitalk')
+          })()
+        </script>
     
 
 

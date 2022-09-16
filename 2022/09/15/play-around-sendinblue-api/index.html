@@ -1,0 +1,721 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Outraverse">
+    <title>Play Around Sendinblue API - Outraverse</title>
+    <meta name="author" content="Outraverse">
+    
+    
+    
+        
+            <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
+        
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Outraverse","sameAs":["https://github.com/outraverse"]},"articleBody":"In my past projects, I have always used PHP and a Linux Server to send emails captured by web GUIs. Today, I need find a way to implementation a email function inside Cyclic.sh serverless platform.\nThe server setup uses ExpressJs as the backend; therefore, of course, PHP is out of window. I tried to search a solution with pure front end JavaScript. Everything I have found required me to hardcode secrets&#x2F;passwords in the source code. But, who would want to do that?\n\n\nThen, I stumbled upon Sendinblue; A solution that can support SMTP, and allow me to send transactional emails via API. I am not advertising this product since I have only using the free plan. It allows me to send 300 emails per day. I am doing a small project, this is the cheap, perfect option for me right now.\nTo use Sendinblue’s Email API, I need to install it SDK.1yarn add sib-api-v3-sdk\n\nThere are other options for PHP, Python, etc. But I am doing ExpressJS today, so I download the SDK package for NodeJS.\nCreate a new API keyNew API authentication keys can be created at https://account.sendinblue.com/advanced/api. Just need to give a name for the purpose of monitoring individual project.\n\nKeep in mind, they only show the key once during the creation. Make sure to copy that key down, otherwise that key is going to be wasted.\n\n\nStore API KEY in codeFor obvious reason, we do not want to write the key inside the code repo. Now we need to install dotenv to kepp all our environment variables.\n1yarn add dotenv\n\ndotenv allows us to utlized .env files. The .env file is located at the root of code repo. Don’t forget to include .env inside the .gitignore file. Otherwise, there’s not much point to use environment variables.\nTo use environment variables, we just need to:\n12require(&quot;dotenv&quot;).config();const apiKey.apiKey = process.env.SIB_Api_key\n\nSIB_Api_key is the variable I defined for my API Key. The name can be anything we wanted, as long as we don’t use any keywords or possible functions names we use in this project.\nSince we always have a default email address to either send or receive email notifications. We can add them in the .env file as well.\nCode Sendinblue Email API1234567891011require(&quot;dotenv&quot;).config();const SibApiV3Sdk = require(&quot;sib-api-v3-sdk&quot;);let defaultClient = SibApiV3Sdk.ApiClient.instance;let apiKey = defaultClient.authentications[&quot;api-key&quot;];apiKey.apiKey = process.env.SIB_Api_Key;let apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();let sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();\n\nCode above is pretty much self explantory. Initialize the SDK library, set up authentication method, define the API instance and the SMTP Email function, call, etc.. Just copy and paste them on top of the code, and call it done.\n1234567891011121314function sendMail(data) &#123;  sendSmtpEmail.subject = data.subject;  sendSmtpEmail.htmlContent = data.message;  sendSmtpEmail.sender = &#123;&quot;name&quot;: data.name, &quot;email&quot;: data.email&#125;;  sendSmtpEmail.to = [&#123;&quot;email&quot;: process.env.SIB_Main_Email, &quot;name&quot;: process.env.SIB_Main_Name&#125;];  sendSmtpEmail.headers = &#123;&quot;sender.ip&quot;: data.senderip&#125;;  apiInstance.sendTransacEmail(sendSmtpEmail).then(function(data) &#123;    console.log(&quot;API called successfully. Returned data: &quot; + JSON.stringify(data));  &#125;,  function(error) &#123;    console.error(error);  &#125;);&#125;\n\nThe next part is to fill all necessary email content. The full list of properties is located at Reference: sendtransacemailhttps://developers.sendinblue.com/reference/sendtransacemail). It contains a list of all body params and their definition.\nAs the code shows, The purpose of my code is to receive email. Therefore sendSmtpEmail.to is set to pre-defined variables.\nI don’t know about anyone else, but I don’t like just display console.log in the backend. I need to return some value back to the front end. With that in mind, I modified sendMail to an asynchronous function, so that whenever I called this function, I am promised to receive a result.\n1async function sendMail(data) &#123;&#125;\n\nDon’t forget to use await when calling this function.\nAnd that’s the backbone of the email function.\nTestingIt’s testing time! Postman, where are you?\nI actually did not have Postman install on my current computer… Alright, I need to download it from https://www.postman.com/.\nPostman is a tool to test API calls. I can manually edit a JSON object and treat it as form data.\n\nWithin a couple seconds, I can the email.\n\nYeah, yeah, yeah… It’s from localhost, It may not be safe, give me a break!!\nNow try one more time with the Web form…\nDoneIt’s fairly simple. At this point, I just need to push the git repository to Github, and let Cyclic doing its auto deployment.\n","dateCreated":"2022-09-15T21:47:46-06:00","dateModified":"2022-09-15T23:00:18-06:00","datePublished":"2022-09-15T21:47:46-06:00","description":"In my past projects, I have always used PHP and a Linux Server to send emails captured by web GUIs. Today, I need find a way to implementation a email function inside Cyclic.sh serverless platform.\nThe server setup uses ExpressJs as the backend; therefore, of course, PHP is out of window. I tried to search a solution with pure front end JavaScript. Everything I have found required me to hardcode secrets&#x2F;passwords in the source code. But, who would want to do that?","headline":"Play Around Sendinblue API","image":["https://cdn.pixabay.com/photo/2014/12/29/17/39/code-583073_960_720.jpg","https://cdn.pixabay.com/photo/2014/12/29/17/39/code-583073_960_720.jpg"],"mainEntityOfPage":{"@type":"WebPage","@id":"http://example.com/2022/09/15/play-around-sendinblue-api/"},"publisher":{"@type":"Organization","name":"Outraverse","sameAs":["https://github.com/outraverse"]},"url":"http://example.com/2022/09/15/play-around-sendinblue-api/","keywords":"ExpressJS, Mail, Sendinblue","thumbnailUrl":"https://cdn.pixabay.com/photo/2014/12/29/17/39/code-583073_960_720.jpg"}</script>
+    <meta name="description" content="In my past projects, I have always used PHP and a Linux Server to send emails captured by web GUIs. Today, I need find a way to implementation a email function inside Cyclic.sh serverless platform. Th">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="Play Around Sendinblue API">
+<meta property="og:url" content="http://example.com/2022/09/15/play-around-sendinblue-api/index.html">
+<meta property="og:site_name" content="Outraverse">
+<meta property="og:description" content="In my past projects, I have always used PHP and a Linux Server to send emails captured by web GUIs. Today, I need find a way to implementation a email function inside Cyclic.sh serverless platform. Th">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://images.ecency.com/DQmP6eJ89Y69SspihyLtTco8a42SGm9CLkmiMjmtjbBirdw/image.png">
+<meta property="og:image" content="https://images.ecency.com/DQmWcDSTy73LA3Dt7mBfEoLz7Bc5qBnNPKLjYJdt8b96iMH/image.png">
+<meta property="og:image" content="https://images.ecency.com/DQmQF9PtSYBBQFhH1HfSf6vJJUWdTEcL7wmDTSLW9p16Jrt/image.png">
+<meta property="article:published_time" content="2022-09-16T03:47:46.000Z">
+<meta property="article:modified_time" content="2022-09-16T05:00:18.932Z">
+<meta property="article:author" content="Outraverse">
+<meta property="article:tag" content="ExpressJS">
+<meta property="article:tag" content="Mail">
+<meta property="article:tag" content="Sendinblue">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://images.ecency.com/DQmP6eJ89Y69SspihyLtTco8a42SGm9CLkmiMjmtjbBirdw/image.png">
+    
+    
+        
+    
+    
+    
+        <meta property="og:image" content="https://cdn.pixabay.com/photo/2014/12/29/17/39/code-583073_960_720.jpg"/>
+        <meta class="swiftype" name="image" data-type="enum" content="https://cdn.pixabay.com/photo/2014/12/29/17/39/code-583073_960_720.jpg"/>
+    
+    
+        <meta property="og:image" content="https://cdn.pixabay.com/photo/2014/12/29/17/39/code-583073_960_720.jpg"/>
+        <meta class="swiftype" name="image" data-type="enum" content="https://cdn.pixabay.com/photo/2014/12/29/17/39/code-583073_960_720.jpg"/>
+    
+    
+    <!--STYLES-->
+    
+<link rel="stylesheet" href="/assets/css/style-sw2pc3nsoq4wah24kk948i2mgqoztb3rpsuvoyg5jpibgvzbdciflcf5caqb.min.css">
+
+    <!--STYLES END-->
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-HH8HSWXCZQ"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-HH8HSWXCZQ');
+    </script>
+
+
+    
+
+    
+        
+            
+<link rel="stylesheet" href="/assets/css/gitalk.css">
+
+        
+    
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+
+<header id="header" data-behavior="4">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a
+            class="header-title-link"
+            href="/"
+            aria-label=""
+        >
+            Outraverse
+        </a>
+    </div>
+    
+        
+            <a
+                class="header-right-picture "
+                href="#about"
+                aria-label="Open the link: /#about"
+            >
+        
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+<nav id="sidebar" data-behavior="4">
+    <div class="sidebar-container">
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/"
+                            
+                            rel="noopener"
+                            title="Home"
+                        >
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/categories"
+                            
+                            rel="noopener"
+                            title="Categories"
+                        >
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Categories</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/tags"
+                            
+                            rel="noopener"
+                            title="Tags"
+                        >
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Tags</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link open-algolia-search"
+                            href="/archives"
+                            
+                            rel="noopener"
+                            title="Archives"
+                        >
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="#about"
+                            
+                            rel="noopener"
+                            title="About"
+                        >
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">About</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://github.com/outraverse"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="GitHub"
+                        >
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/atom.xml"
+                            
+                            rel="noopener"
+                            title="RSS"
+                        >
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+        <div class="post-header-cover
+                    text-center
+                    post-header-cover--partial"
+             style="background-image:url('https://cdn.pixabay.com/photo/2014/12/29/17/39/code-583073_960_720.jpg');"
+             data-behavior="4">
+            
+                <div class="post-header main-content-wrap text-center">
+    
+        <h1 class="post-title">
+            Play Around Sendinblue API
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2022-09-15T21:47:46-06:00">
+	
+		    Sep 15, 2022
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/JavaScript/">JavaScript</a>
+
+
+    
+</div>
+
+    
+</div>
+
+            
+        </div>
+
+            <div id="main" data-behavior="4"
+                 class="hasCover
+                        hasCoverMetaIn
+                        hasCoverCaption">
+                
+<article class="post">
+    
+        <span class="post-header-cover-caption caption">Writing a Mail function with ExpressJS and Sendinblue Mail API</span>
+    
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <p>In my past projects, I have always used PHP and a Linux Server to send emails captured by web GUIs. Today, I need find a way to implementation a email function inside Cyclic.sh serverless platform.</p>
+<p>The server setup uses ExpressJs as the backend; therefore, of course, PHP is out of window. I tried to search a solution with pure front end JavaScript. Everything I have found required me to hardcode secrets&#x2F;passwords in the source code. <strong>But, who would want to do that?</strong></p>
+<span id="more"></span>
+
+<p>Then, I stumbled upon <strong><a target="_blank" rel="noopener" href="https://www.sendinblue.com/">Sendinblue</a></strong>; A solution that can support SMTP, and allow me to send transactional emails via API. I am not advertising this product since I have only using the free plan. It allows me to send 300 emails per day. I am doing a small project, this is the cheap, perfect option for me right now.</p>
+<h3 id="To-use-Sendinblue’s-Email-API-I-need-to-install-it-SDK"><a href="#To-use-Sendinblue’s-Email-API-I-need-to-install-it-SDK" class="headerlink" title="To use Sendinblue’s Email API, I need to install it SDK."></a>To use Sendinblue’s Email API, I need to install it SDK.</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yarn add sib-api-v3-sdk</span><br></pre></td></tr></table></figure>
+
+<p>There are other options for PHP, Python, etc. But I am doing ExpressJS today, so I download the SDK package for NodeJS.</p>
+<h3 id="Create-a-new-API-key"><a href="#Create-a-new-API-key" class="headerlink" title="Create a new API key"></a>Create a new API key</h3><p>New API authentication keys can be created at <a target="_blank" rel="noopener" href="https://account.sendinblue.com/advanced/api">https://account.sendinblue.com/advanced/api</a>. Just need to give a name for the purpose of monitoring individual project.</p>
+<p><img src="https://images.ecency.com/DQmP6eJ89Y69SspihyLtTco8a42SGm9CLkmiMjmtjbBirdw/image.png"></p>
+<div class="alert warning"><p>Keep in mind, they only show the key once during the creation. Make sure to copy that key down, otherwise that key is going to be wasted.</p>
+</div>
+
+<h3 id="Store-API-KEY-in-code"><a href="#Store-API-KEY-in-code" class="headerlink" title="Store API KEY in code"></a>Store API KEY in code</h3><p>For obvious reason, we do not want to write the key inside the code repo. Now we need to install dotenv to kepp all our environment variables.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yarn add dotenv</span><br></pre></td></tr></table></figure>
+
+<p><code>dotenv</code> allows us to utlized .env files. The .env file is located at the root of code repo. Don’t forget to include .env inside the .gitignore file. Otherwise, there’s not much point to use environment variables.</p>
+<p>To use environment variables, we just need to:</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">require</span>(<span class="string">&quot;dotenv&quot;</span>).<span class="title function_">config</span>();</span><br><span class="line"><span class="keyword">const</span> apiKey.<span class="property">apiKey</span> = process.<span class="property">env</span>.<span class="property">SIB_Api_key</span></span><br></pre></td></tr></table></figure>
+
+<p>SIB_Api_key is the variable I defined for my API Key. The name can be anything we wanted, as long as we don’t use any keywords or possible functions names we use in this project.</p>
+<p>Since we always have a default email address to either send or receive email notifications. We can add them in the .env file as well.</p>
+<h3 id="Code-Sendinblue-Email-API"><a href="#Code-Sendinblue-Email-API" class="headerlink" title="Code Sendinblue Email API"></a>Code Sendinblue Email API</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">require</span>(<span class="string">&quot;dotenv&quot;</span>).<span class="title function_">config</span>();</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="title class_">SibApiV3Sdk</span> = <span class="built_in">require</span>(<span class="string">&quot;sib-api-v3-sdk&quot;</span>);</span><br><span class="line"><span class="keyword">let</span> defaultClient = <span class="title class_">SibApiV3Sdk</span>.<span class="property">ApiClient</span>.<span class="property">instance</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> apiKey = defaultClient.<span class="property">authentications</span>[<span class="string">&quot;api-key&quot;</span>];</span><br><span class="line">apiKey.<span class="property">apiKey</span> = process.<span class="property">env</span>.<span class="property">SIB_Api_Key</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> apiInstance = <span class="keyword">new</span> <span class="title class_">SibApiV3Sdk</span>.<span class="title class_">TransactionalEmailsApi</span>();</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> sendSmtpEmail = <span class="keyword">new</span> <span class="title class_">SibApiV3Sdk</span>.<span class="title class_">SendSmtpEmail</span>();</span><br></pre></td></tr></table></figure>
+
+<p>Code above is pretty much self explantory. Initialize the SDK library, set up authentication method, define the API instance and the SMTP Email function, call, etc.. Just copy and paste them on top of the code, and call it done.</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">sendMail</span>(<span class="params">data</span>) &#123;</span><br><span class="line">  sendSmtpEmail.<span class="property">subject</span> = data.<span class="property">subject</span>;</span><br><span class="line">  sendSmtpEmail.<span class="property">htmlContent</span> = data.<span class="property">message</span>;</span><br><span class="line">  sendSmtpEmail.<span class="property">sender</span> = &#123;<span class="string">&quot;name&quot;</span>: data.<span class="property">name</span>, <span class="string">&quot;email&quot;</span>: data.<span class="property">email</span>&#125;;</span><br><span class="line">  sendSmtpEmail.<span class="property">to</span> = [&#123;<span class="string">&quot;email&quot;</span>: process.<span class="property">env</span>.<span class="property">SIB_Main_Email</span>, <span class="string">&quot;name&quot;</span>: process.<span class="property">env</span>.<span class="property">SIB_Main_Name</span>&#125;];</span><br><span class="line">  sendSmtpEmail.<span class="property">headers</span> = &#123;<span class="string">&quot;sender.ip&quot;</span>: data.<span class="property">senderip</span>&#125;;</span><br><span class="line"></span><br><span class="line">  apiInstance.<span class="title function_">sendTransacEmail</span>(sendSmtpEmail).<span class="title function_">then</span>(<span class="keyword">function</span>(<span class="params">data</span>) &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&quot;API called successfully. Returned data: &quot;</span> + <span class="title class_">JSON</span>.<span class="title function_">stringify</span>(data));</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="keyword">function</span>(<span class="params">error</span>) &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">error</span>(error);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>The next part is to fill all necessary email content. The full list of properties is located at <a href="">Reference: sendtransacemail</a><a target="_blank" rel="noopener" href="https://developers.sendinblue.com/reference/sendtransacemail">https://developers.sendinblue.com/reference/sendtransacemail</a>). It contains a list of all body params and their definition.</p>
+<p>As the code shows, The purpose of my code is to receive email. Therefore sendSmtpEmail.to is set to pre-defined variables.</p>
+<p>I don’t know about anyone else, but I don’t like just display console.log in the backend. I need to return some value back to the front end. With that in mind, I modified <code>sendMail</code> to an asynchronous function, so that whenever I called this function, I am promised to receive a result.</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">async</span> <span class="keyword">function</span> <span class="title function_">sendMail</span>(<span class="params">data</span>) &#123;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Don’t forget to use <code>await</code> when calling this function.</p>
+<p>And that’s the backbone of the email function.</p>
+<h3 id="Testing"><a href="#Testing" class="headerlink" title="Testing"></a>Testing</h3><p>It’s testing time! Postman, where are you?</p>
+<p>I actually did not have Postman install on my current computer… Alright, I need to download it from <a target="_blank" rel="noopener" href="https://www.postman.com/">https://www.postman.com/</a>.</p>
+<p>Postman is a tool to test API calls. I can manually edit a JSON object and treat it as form data.</p>
+<p><img src="https://images.ecency.com/DQmWcDSTy73LA3Dt7mBfEoLz7Bc5qBnNPKLjYJdt8b96iMH/image.png"></p>
+<p>Within a couple seconds, I can the email.</p>
+<p><img src="https://images.ecency.com/DQmQF9PtSYBBQFhH1HfSf6vJJUWdTEcL7wmDTSLW9p16Jrt/image.png"></p>
+<p>Yeah, yeah, yeah… It’s from localhost, It may not be safe, give me a break!!</p>
+<p>Now try one more time with the Web form…</p>
+<h3 id="Done"><a href="#Done" class="headerlink" title="Done"></a>Done</h3><p>It’s fairly simple. At this point, I just need to push the git repository to Github, and let Cyclic doing its auto deployment.</p>
+
+            
+
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">TAGGED IN</span><br/>
+                
+    <a class="tag tag--primary tag--small t-none-link" href="/tags/ExpressJS/" rel="tag">ExpressJS</a> <a class="tag tag--primary tag--small t-none-link" href="/tags/Mail/" rel="tag">Mail</a> <a class="tag tag--primary tag--small t-none-link" href="/tags/Sendinblue/" rel="tag">Sendinblue</a>
+
+            </div>
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a
+                        class="post-action-btn btn btn--disabled"
+                        aria-hidden="true"
+                    >
+                        
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/09/02/first-blog-in-Outraverse/"
+                    data-tooltip="First Blog in Outraverse"
+                    aria-label="NEXT: First Blog in Outraverse"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=http://example.com/2022/09/15/play-around-sendinblue-api/"
+                    title="Share on Facebook"
+                    aria-label="Share on Facebook"
+                >
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://twitter.com/intent/tweet?text=http://example.com/2022/09/15/play-around-sendinblue-api/"
+                    title="Share on Twitter"
+                    aria-label="Share on Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://plus.google.com/share?url=http://example.com/2022/09/15/play-around-sendinblue-api/"
+                    title="Share on Google+"
+                    aria-label="Share on Google+"
+                >
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.linkedin.com/shareArticle?mini=true&amp;url=http://example.com/2022/09/15/play-around-sendinblue-api/"
+                    title="global.share_on_linkedin"
+                    aria-label="global.share_on_linkedin"
+                >
+                    <i class="fab fa-linkedin" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#gitalk"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="gitalk"></div>
+
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2022 Outraverse. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a
+                        class="post-action-btn btn btn--disabled"
+                        aria-hidden="true"
+                    >
+                        
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/09/02/first-blog-in-Outraverse/"
+                    data-tooltip="First Blog in Outraverse"
+                    aria-label="NEXT: First Blog in Outraverse"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=http://example.com/2022/09/15/play-around-sendinblue-api/"
+                    title="Share on Facebook"
+                    aria-label="Share on Facebook"
+                >
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://twitter.com/intent/tweet?text=http://example.com/2022/09/15/play-around-sendinblue-api/"
+                    title="Share on Twitter"
+                    aria-label="Share on Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://plus.google.com/share?url=http://example.com/2022/09/15/play-around-sendinblue-api/"
+                    title="Share on Google+"
+                    aria-label="Share on Google+"
+                >
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.linkedin.com/shareArticle?mini=true&amp;url=http://example.com/2022/09/15/play-around-sendinblue-api/"
+                    title="global.share_on_linkedin"
+                    aria-label="global.share_on_linkedin"
+                >
+                    <i class="fab fa-linkedin" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#gitalk"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href="https://www.facebook.com/sharer/sharer.php?u=http://example.com/2022/09/15/play-around-sendinblue-api/"
+                        aria-label="Share on Facebook"
+                    >
+                        <i class="fab fa-facebook" aria-hidden="true"></i><span>Share on Facebook</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href="https://twitter.com/intent/tweet?text=http://example.com/2022/09/15/play-around-sendinblue-api/"
+                        aria-label="Share on Twitter"
+                    >
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href="https://plus.google.com/share?url=http://example.com/2022/09/15/play-around-sendinblue-api/"
+                        aria-label="Share on Google+"
+                    >
+                        <i class="fab fa-google-plus" aria-hidden="true"></i><span>Share on Google+</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href="https://www.linkedin.com/shareArticle?mini=true&amp;url=http://example.com/2022/09/15/play-around-sendinblue-api/"
+                        aria-label="global.share_on_linkedin"
+                    >
+                        <i class="fab fa-linkedin" aria-hidden="true"></i><span>global.share_on_linkedin</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
+
+
+            
+        </div>
+        
+
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <h4 id="about-card-name">Outraverse</h4>
+        
+            <div id="about-card-bio"><p>I Manage Outraverse</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                <p>IT Program Manager</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br/>
+                Colorado
+            </div>
+        
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+
+<script src="/assets/js/script-yhrbpfyodwxrwpr2lbsf6ajykfdkjircaq0t3vfbpqzztl0ns5fe9j0dv9em.min.js"></script>
+
+<!--SCRIPTS END-->
+
+
+    
+        
+<script src="/assets/js/gitalk.js"></script>
+
+        <script type="text/javascript">
+          (function() {
+            new Gitalk({
+              clientID: 'f0b90513862af7a23286',
+              clientSecret: '4c2c3ec636dccc646efa4ba3350bc4baa1c75706',
+              repo: 'io.blog-comments',
+              owner: 'outraverse',
+              admin: ['outraverse'],
+              id: '2022/09/15/play-around-sendinblue-api/',
+              ...{"language":"en","perPage":10,"distractionFreeMode":false,"enableHotKey":true,"pagerDirection":"first"}
+            }).render('gitalk')
+          })()
+        </script>
+    
+
+
+
+
+    </body>
+</html>

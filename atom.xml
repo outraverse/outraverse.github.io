@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2022-09-28T04:56:06.908Z</updated>
+  <updated>2022-10-15T22:26:28.013Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -15,6 +15,29 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>OpenHPC Generate Job Data Report</title>
+    <link href="http://example.com/2022/10/15/OpenHPC-Generate-Job-Data-Report/"/>
+    <id>http://example.com/2022/10/15/OpenHPC-Generate-Job-Data-Report/</id>
+    <published>2022-10-15T20:41:43.000Z</published>
+    <updated>2022-10-15T22:26:28.013Z</updated>
+    
+    <content type="html"><![CDATA[<p>We received a customer request to generate a resource usages from individual jobs inside our High Performance Cluster environment. We have Zabbix installed in the environment; however, we want to see if we could generate something from the system itself natively.</p><span id="more"></span><p>OpenHPC uses SLURM to manage worlloads. Therefore, we can dive into SLURM commands to approach this task. None of us have taken SchedMD training courses, our knowledge came from Slurm documentation[1], or plan Google searches. This is a good opportunity and use case to get ourselves more familiar with HPC ecosystems.</p><h2 id="Approach"><a href="#Approach" class="headerlink" title="Approach"></a>Approach</h2><p>We know “<strong>sacct</strong>“ is a Slurm command that displays accounting data for all jobs and job steps in the Slurm job accoutning log and&#x2F;or database[2]. Therefore, I started to going through its manual page.</p><p><strong>sacct</strong> has options to query a start and end dates, and it can also toggle between the current user and all users’ job history. This is good. So we test the following command:</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sacct -S 2022-10-01 -E 2022-10-14 -X -a -o JobID,Start,End,Elapsed,ReqMem,ReqCPUS,User,Node</span><br></pre></td></tr></table></figure><p>where:</p><ul><li><strong>-S</strong> is the start date of the query</li><li><strong>-E</strong> is the end date of the query</li><li><strong>-X</strong> is statistics relevant to each job allocation</li><li><strong>-a</strong> is all users</li><li>and <strong>-o</strong> stand for format. Note</li></ul><div class="alert warning"><p>all queried fields cannot have space after comma, it will treat whatever behind the first space seperated arguments.</p></div><p>The output showed us exactly what we needed. Cool. Now we can capture the data displayed on screen into a file by redirect the standand output with “<strong>&gt;</strong>“</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sacct -S 2022-10-01 -E 2022-10-14 -X -a -o JobID,Start,End,Elapsed,ReqMem,ReqCPUS,User,Node &gt; filename</span><br></pre></td></tr></table></figure><p>But, I want to save the data into a CSV format. This way I can just send my file as a report to the customer.</p><p>I did not see any options to convert tabs between each field to commas; however, there is an option, <em><strong>–parsable2</strong></em> to delimited data with “|”. That’s good enough, we can always manipulate string inside a Bash Script.</p><p>Now the command has became:</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sacct -S 2022-10-01 -E 2022-10-14 -X -a -o JobID,Start,End,Elapsed,ReqMem,ReqCPUS,User,Node --parsable2 &gt; filename</span><br></pre></td></tr></table></figure><p><strong>sed</strong> command is a Linux&#x2F;Unix command, that can transform text by replacing a string with another string. Here, we want to replace “<strong>|</strong>“ with “<strong>,</strong>“. </p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sed &#x27;s/|/,/g&#x27; filename &gt; new_filename.csv</span><br></pre></td></tr></table></figure><p>This will do the trick.</p><h2 id="Implentation"><a href="#Implentation" class="headerlink" title="Implentation"></a>Implentation</h2><p>We can write these two line of bash command into a script:</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">#!/bin/bash</span><br><span class="line">sacct -S 2022-10-01 -E 2022-10-14 -X -a -o JobID,Start,End,Elapsed,ReqMem,ReqCPUS,User,Node --parsable2 &gt; filename</span><br><span class="line">sed &#x27;s/|/,/g&#x27; filename &gt; new_filename.csv</span><br><span class="line"># remove filename</span><br><span class="line">rm filename</span><br></pre></td></tr></table></figure><p>Since <em><strong>filename</strong></em> is just a temporary file; we really do not need to save it when we really just need to CSV file. We can just delete it at the end. We can use <code>sed --in-place</code> to write new output into the same file; but we still will have a backup copy of the original to deal with. It makes no difference between in-place editing and create a temprary file, then delete it later.</p><p>Another argument of why we did our approach is we do not have much data; therefore, we just don’t care if we have to write two files to the disk.</p><h2 id="Afterthought"><a href="#Afterthought" class="headerlink" title="Afterthought"></a>Afterthought</h2><p>There are a couple of more things we can do to make this tiny script more useful:</p><ol><li>We can make the start and end date dynamic so that we can run the same script in the future.</li><li>With a dynamic start and end date, we make a cronjob to run this script monthly.</li><li>Email the output CSV file to a email group or SCP to a shared file server for review.</li></ol><p>Nonetheless, our customer hasn’t asked any automated reports yet; so, this is it for now.</p><hr><h3 id="References"><a href="#References" class="headerlink" title="References"></a>References</h3><ol><li><a href="https://slurm.schedmd.com/documentation.html">slurm.schedmd.com&#x2F;documentation.html</a></li><li><a href="https://slurm.schedmd.com/sacct.html">https://slurm.schedmd.com/sacct.html</a></li></ol>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;We received a customer request to generate a resource usages from individual jobs inside our High Performance Cluster environment. We have Zabbix installed in the environment; however, we want to see if we could generate something from the system itself natively.&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="OpenHPC" scheme="http://example.com/categories/OpenHPC/"/>
+    
+    
+    <category term="OpenHPC" scheme="http://example.com/tags/OpenHPC/"/>
+    
+    <category term="Slurm" scheme="http://example.com/tags/Slurm/"/>
+    
+  </entry>
   
   <entry>
     <title>Firebase and Namecheap</title>

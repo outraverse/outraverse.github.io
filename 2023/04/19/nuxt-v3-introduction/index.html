@@ -1,0 +1,724 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Outraverse">
+    <title>Nuxt v3, Introduction - Outraverse</title>
+    <meta name="author" content="Outraverse">
+    
+    
+    
+        
+            <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
+        
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Outraverse","sameAs":["https://github.com/outraverse"]},"articleBody":"Nuxt is a framework for developing server-side redered (SSR) VueJS applications. It prioritizes providing an optimal developer experience by furnishing features such as automatic code splitting, file-based routing, server-side rendering, static site generation, and search engine optimization. \n\n\nWhen working with Nuxt, the main difference from Vue development without a framework is that most of the required imports, such as routing components, do not need to be defined by the developer. Nevertheless, creating a Nuxt codebase for the first time may pose challenges to even experienced VueJS developers, as there is no “main.ts” or “main.js” file to import all the necessary libraries for the Vue object.\nWhile the official documentation is online, the recent release of Nuxt v3 means that certain libraries and plugins may still be under development. As a newcomer to Nuxt during this era, I have discovered some useful insights that may be beneficial to other developers embarking on their first Nuxt v3 project.\n\nFile StructureNuxt, being a framework built on top of VueJS, adheres to Vue’s file structure convention. Developers do not need to worry about updating Vue Router manually.\nWith vanila VueJS projects, the best practice is to place routing components into /view or /pages directories under the root of the code base. However, developer can really store these components anywhere as long as they define them correctly in the router file and or co-developers can tolerate the inormal file structure.\nIn Nuxt project, all routing components are stored inside ~/pages directory. Nuxt uses a file-based routing system, which means what we placed inside the ~/pages directory will reflect on the web URIs. ~/pages/about-us.vue will be the address for https://domain.com/about-us. A nested component file such as ~/pages/admin/dashboard.vue will be https://domain.com/admin/dashboard.\nIn addition, Nuxt provides a customizable layouts framework which is not available in vanilla VueJS. The layouts framework helps to define a consistent structure for the designed application. In Nuxt, developers can define commonly used components as reusable components, and then they have to manually define the layout in the app.vue file. \nA default layout (~/layouts/default.vue) can be created with the following code:\n1234567&lt;template&gt;  &lt;div&gt;    &lt;AppHeader /&gt;    &lt;NuxtPage class=&quot;container&quot; /&gt;    &lt;AppFooter /&gt;  &lt;/div&gt;&lt;/template&gt;\n\nThis layout adds a header and a footer to every webpages. \nNotibly, developers did not need to import header or footer components. Nuxt does it automatically.\n\nFont AwesomeApart from the built-in font libraries that come with various CSS frameworks, Font Awesome is considered the most commonly used. \nIn the vanila VueJs environment, font Awesome, like many other JS&#x2F;TS or CSS libraries, are defined in main.ts&#x2F;main.js as shown below:\n1234567/* Add font awesome library */import &#123; library, dom &#125; from &quot;@fortawesome/fontawesome-svg-core&quot;;import &#123; FontAwesomeIcon &#125; from &quot;@fortawesome/vue-fontawesome&quot;;import &#123; faChevronDown, faCopyright, faBars &#125; from &quot;@fortawesome/free-solid-svg-icons&quot;;import &#123; faBtc, faTwitterSquare, faGithubSquare, faYoutubeSquare &#125; from &quot;@fortawesome/free-brands-svg-icons&quot;;library.add(faBtc, faChevronDown, faCopyright, faBars, faTwitterSquare, faGithubSquare, faYoutubeSquare);dom.watch();\n\nIn Nuxt v3 where Font Awesome hasn’t been adapt into an official module yet, developers can create a custom plugins inside ~/plugins directory. Just simply create a JavaScript or TypeScript file and call it fontawesome.[js | ts].\n12345678910111213import &#123; library, config &#125; from &quot;@fortawesome/fontawesome-svg-core&quot;import &#123; FontAwesomeIcon &#125; from &quot;@fortawesome/vue-fontawesome&quot;import &#123; faTwitterSquare, faGithubSquare, faYoutubeSquare &#125; from &quot;@fortawesome/free-brands-svg-icons&quot;import &#123; faChevronDown, faCopyright, faBars &#125; from &quot;@fortawesome/free-solid-svg-icons&quot;library.add(faBtc, faChevronDown, faCopyright, faBars, faTwitterSquare, faGithubSquare, faYoutubeSquare)// This is important, we are going to let Nuxt worry about the CSSconfig.autoAddCss = falseexport default defineNuxtPlugin((nuxtApp) =&gt; &#123;  nuxtApp.vueApp.component(&quot;font-awesome-icon&quot;, FontAwesomeIcon, &#123;&#125;)&#125;)\n\nCode sample above is a JavaScript version of the Fontawesome plugin. Even though Nuxt v3 requires TypeScript, a JS file can still be used.\nif we look closely, we can notice that importing Font Awesome in Vue and Nuxt is basically the same. Nuxt is built on top of Vue, so what works in Vue will work in Nuxt as well.\nMost of Nuxt’s settings can be found in the ~/nuxt.config.ts file. To register Font Awesome’s CSS file, navigate to the CSS section or add the following:\n1234css: [    &quot;@fortawesome/fontawesome-svg-core/styles.css&quot;,    /*** other CSS libraries ***/],\n\nUsing Font Awesome in Vue Components is the same as in VueJS project: &lt;font-awesome-icon :icon=&quot;[&#39;fab&#39;, &#39;twitter-square&#39;]&quot; /&gt;.\n\nInternationalizationAs a bilingual person, adding multi-language functionality is always an essnetial aspect of software development, particularly in web applications. Over the years, Multiple languages has become quite standardized by using i18n, regardless of the environment used.\nTo install i18n in Nuxt v3, run installation with yarn or npm, or add the following in package.json:\n1&quot;@nuxtjs/i18n&quot;: &quot;^8.0.0-beta.10&quot;\n\nSimilar to Font Awesome, i18n configuration is added in nuxt.config.ts. Instead of storing all language data inside the nuxt.config.ts file, it’s cleaner and more organized to use multiple JSON or YAML files to store each language separately. These language files can be placed anywhere within the code repository. For the purpose of clarity, let’s assume that a directory called ~/locales has been created under the root of the code repo.\nAt the top of the nuxt.config.ts file, add:\n123import en from &quot;./locales/en.json&quot;;import fr from &quot;./locales/fr.json&quot;;import zh from &quot;./locales/zh.json&quot;;\n\nFind or create the modules section in the nuxt.config.ts file:\n123modules: [  &quot;@nuxtjs/i18n&quot;],\n\nSince i18n has a community module in the Nuxt v3 ecosystem, there is no need to create a new plugin.\nTo configure i18n, add a new section inside the nuxt.config.ts file:\n12345678910111213141516i18n: &#123;  locales: [    &#123; code: &quot;en&quot;, name: &quot;English&quot; &#125;,    &#123; code: &quot;en&quot;, name: &quot;langue français&quot; &#125;    &#123; code: &quot;zh&quot;, name: &quot;中文&quot; &#125;,  ],  defaultLocale: &quot;en&quot;,  vueI18n: &#123;    fallbackLocale: &quot;en&quot;,    messages: &#123;      en,      fr,      zh,    &#125;,  &#125;,&#125;\n\nThe objects en, fr, and zh are imported from the JSON files. The locales array allows developers to retrieve the list of all supported languages in the project from any component.\n1234567891011121314151617&lt;template&gt;  &lt;div class=&quot;navbar-dropdown is-right&quot;&gt;    &lt;a v-for=&quot;l in locales&quot; :key=&quot;l.code&quot; class=&quot;navbar-item&quot;&gt;      &#123;&#123; l.name &#125;&#125;    &lt;/a&gt;  &lt;/div&gt;&lt;template&gt;&lt;script lang=&quot;ts&quot;&gt;  export default &#123;    computed: &#123;      locales(): LocaleObject[] &#123;        return this.$i18n.locales      &#125;    &#125;  &#125;&lt;/script&gt;\n\nLastly, the default language of this project is English since defaultLocale is set to “en”.\n","dateCreated":"2023-04-19T13:41:52-06:00","dateModified":"2023-04-22T09:43:27-06:00","datePublished":"2023-04-19T13:41:52-06:00","description":"Nuxt is a framework for developing server-side redered (SSR) VueJS applications. It prioritizes providing an optimal developer experience by furnishing features such as automatic code splitting, file-based routing, server-side rendering, static site generation, and search engine optimization. ","headline":"Nuxt v3, Introduction","image":["https://nuxtjs.org/_nuxt/image/0fc764.png","https://nuxtjs.org/_nuxt/image/0fc764.png"],"mainEntityOfPage":{"@type":"WebPage","@id":"http://example.com/2023/04/19/nuxt-v3-introduction/"},"publisher":{"@type":"Organization","name":"Outraverse","sameAs":["https://github.com/outraverse"]},"url":"http://example.com/2023/04/19/nuxt-v3-introduction/","keywords":"Vue, Nuxt, JavaScript, TypeScript","thumbnailUrl":"https://nuxtjs.org/_nuxt/image/0fc764.png"}</script>
+    <meta name="description" content="Nuxt is a framework for developing server-side redered (SSR) VueJS applications. It prioritizes providing an optimal developer experience by furnishing features such as automatic code splitting, file-">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="Nuxt v3, Introduction">
+<meta property="og:url" content="http://example.com/2023/04/19/nuxt-v3-introduction/index.html">
+<meta property="og:site_name" content="Outraverse">
+<meta property="og:description" content="Nuxt is a framework for developing server-side redered (SSR) VueJS applications. It prioritizes providing an optimal developer experience by furnishing features such as automatic code splitting, file-">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2023-04-19T19:41:52.000Z">
+<meta property="article:modified_time" content="2023-04-22T15:43:27.920Z">
+<meta property="article:author" content="Outraverse">
+<meta property="article:tag" content="Vue">
+<meta property="article:tag" content="Nuxt">
+<meta property="article:tag" content="JavaScript">
+<meta property="article:tag" content="TypeScript">
+<meta name="twitter:card" content="summary">
+    
+    
+        
+    
+    
+    
+        <meta property="og:image" content="https://nuxtjs.org/_nuxt/image/0fc764.png"/>
+        <meta class="swiftype" name="image" data-type="enum" content="https://nuxtjs.org/_nuxt/image/0fc764.png"/>
+    
+    
+        <meta property="og:image" content="https://nuxtjs.org/_nuxt/image/0fc764.png"/>
+        <meta class="swiftype" name="image" data-type="enum" content="https://nuxtjs.org/_nuxt/image/0fc764.png"/>
+    
+    
+    <!--STYLES-->
+    
+<link rel="stylesheet" href="/assets/css/style-sw2pc3nsoq4wah24kk948i2mgqoztb3rpsuvoyg5jpibgvzbdciflcf5caqb.min.css">
+
+    <!--STYLES END-->
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-HH8HSWXCZQ"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-HH8HSWXCZQ');
+    </script>
+
+
+    
+
+    
+        
+            
+<link rel="stylesheet" href="/assets/css/gitalk.css">
+
+        
+    
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+
+<header id="header" data-behavior="4">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a
+            class="header-title-link"
+            href="/"
+            aria-label=""
+        >
+            Outraverse
+        </a>
+    </div>
+    
+        
+            <a
+                class="header-right-picture "
+                href="#about"
+                aria-label="Open the link: /#about"
+            >
+        
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+<nav id="sidebar" data-behavior="4">
+    <div class="sidebar-container">
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/"
+                            
+                            rel="noopener"
+                            title="Home"
+                        >
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/categories"
+                            
+                            rel="noopener"
+                            title="Categories"
+                        >
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Categories</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/tags"
+                            
+                            rel="noopener"
+                            title="Tags"
+                        >
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Tags</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link open-algolia-search"
+                            href="/archives"
+                            
+                            rel="noopener"
+                            title="Archives"
+                        >
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="#about"
+                            
+                            rel="noopener"
+                            title="About"
+                        >
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">About</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://github.com/outraverse"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="GitHub"
+                        >
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/atom.xml"
+                            
+                            rel="noopener"
+                            title="RSS"
+                        >
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+        <div class="post-header-cover
+                    text-center
+                    post-header-cover--partial"
+             style="background-image:url('https://nuxtjs.org/_nuxt/image/0fc764.png');"
+             data-behavior="4">
+            
+                <div class="post-header main-content-wrap text-center">
+    
+        <h1 class="post-title">
+            Nuxt v3, Introduction
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2023-04-19T13:41:52-06:00">
+	
+		    Apr 19, 2023
+    	
+    </time>
+    
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/Nuxt/">Nuxt</a>
+
+
+    
+</div>
+
+    
+</div>
+
+            
+        </div>
+
+            <div id="main" data-behavior="4"
+                 class="hasCover
+                        hasCoverMetaIn
+                        hasCoverCaption">
+                
+<article class="post">
+    
+        <span class="post-header-cover-caption caption">Getting started with Nuxt v3, basic instruction</span>
+    
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <p>Nuxt is a framework for developing server-side redered (SSR) VueJS applications. It prioritizes providing an optimal developer experience by furnishing features such as automatic code splitting, file-based routing, server-side rendering, static site generation, and search engine optimization. </p>
+<span id="more"></span>
+
+<p>When working with Nuxt, the main difference from Vue development without a framework is that most of the required imports, such as routing components, do not need to be defined by the developer. Nevertheless, creating a Nuxt codebase for the first time may pose challenges to even experienced VueJS developers, as there is no “main.ts” or “main.js” file to import all the necessary libraries for the Vue object.</p>
+<p>While the official documentation is online, the recent release of Nuxt v3 means that certain libraries and plugins may still be under development. As a newcomer to Nuxt during this era, I have discovered some useful insights that may be beneficial to other developers embarking on their first Nuxt v3 project.</p>
+<hr>
+<h2 id="File-Structure"><a href="#File-Structure" class="headerlink" title="File Structure"></a>File Structure</h2><p>Nuxt, being a framework built on top of VueJS, adheres to Vue’s file structure convention. Developers do not need to worry about updating Vue Router manually.</p>
+<p>With vanila VueJS projects, the best practice is to place routing components into <code>/view</code> or <code>/pages</code> directories under the root of the code base. However, developer can really store these components anywhere as long as they define them correctly in the router file and or co-developers can tolerate the inormal file structure.</p>
+<p>In Nuxt project, all routing components are stored inside <code>~/pages</code> directory. Nuxt uses a file-based routing system, which means what we placed inside the <code>~/pages</code> directory will reflect on the web URIs. <code>~/pages/about-us.vue</code> will be the address for <code>https://domain.com/about-us</code>. A nested component file such as <code>~/pages/admin/dashboard.vue</code> will be <code>https://domain.com/admin/dashboard</code>.</p>
+<p>In addition, Nuxt provides a customizable layouts framework which is not available in vanilla VueJS. The layouts framework helps to define a consistent structure for the designed application. In Nuxt, developers can define commonly used components as reusable components, and then they have to manually define the layout in the app.vue file. </p>
+<p>A default layout (<code>~/layouts/default.vue</code>) can be created with the following code:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;</span><br><span class="line">    &lt;AppHeader /&gt;</span><br><span class="line">    &lt;NuxtPage class=&quot;container&quot; /&gt;</span><br><span class="line">    &lt;AppFooter /&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br></pre></td></tr></table></figure>
+
+<p>This layout adds a header and a footer to every webpages. </p>
+<p>Notibly, developers did not need to import header or footer components. Nuxt does it automatically.</p>
+<hr>
+<h2 id="Font-Awesome"><a href="#Font-Awesome" class="headerlink" title="Font Awesome"></a>Font Awesome</h2><p>Apart from the built-in font libraries that come with various CSS frameworks, Font Awesome is considered the most commonly used. </p>
+<p>In the vanila VueJs environment, font Awesome, like many other JS&#x2F;TS or CSS libraries, are defined in <code>main.ts</code>&#x2F;<code>main.js</code> as shown below:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">/* Add font awesome library */</span><br><span class="line">import &#123; library, dom &#125; from &quot;@fortawesome/fontawesome-svg-core&quot;;</span><br><span class="line">import &#123; FontAwesomeIcon &#125; from &quot;@fortawesome/vue-fontawesome&quot;;</span><br><span class="line">import &#123; faChevronDown, faCopyright, faBars &#125; from &quot;@fortawesome/free-solid-svg-icons&quot;;</span><br><span class="line">import &#123; faBtc, faTwitterSquare, faGithubSquare, faYoutubeSquare &#125; from &quot;@fortawesome/free-brands-svg-icons&quot;;</span><br><span class="line">library.add(faBtc, faChevronDown, faCopyright, faBars, faTwitterSquare, faGithubSquare, faYoutubeSquare);</span><br><span class="line">dom.watch();</span><br></pre></td></tr></table></figure>
+
+<p>In Nuxt v3 where Font Awesome hasn’t been adapt into an official module yet, developers can create a custom plugins inside <code>~/plugins</code> directory. Just simply create a JavaScript or TypeScript file and call it <code>fontawesome.[js | ts]</code>.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">import &#123; library, config &#125; from &quot;@fortawesome/fontawesome-svg-core&quot;</span><br><span class="line">import &#123; FontAwesomeIcon &#125; from &quot;@fortawesome/vue-fontawesome&quot;</span><br><span class="line">import &#123; faTwitterSquare, faGithubSquare, faYoutubeSquare &#125; from &quot;@fortawesome/free-brands-svg-icons&quot;</span><br><span class="line">import &#123; faChevronDown, faCopyright, faBars &#125; from &quot;@fortawesome/free-solid-svg-icons&quot;</span><br><span class="line"></span><br><span class="line">library.add(faBtc, faChevronDown, faCopyright, faBars, faTwitterSquare, faGithubSquare, faYoutubeSquare)</span><br><span class="line"></span><br><span class="line">// This is important, we are going to let Nuxt worry about the CSS</span><br><span class="line">config.autoAddCss = false</span><br><span class="line"></span><br><span class="line">export default defineNuxtPlugin((nuxtApp) =&gt; &#123;</span><br><span class="line">  nuxtApp.vueApp.component(&quot;font-awesome-icon&quot;, FontAwesomeIcon, &#123;&#125;)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>Code sample above is a JavaScript version of the Fontawesome plugin. Even though Nuxt v3 requires TypeScript, a JS file can still be used.</p>
+<p>if we look closely, we can notice that importing Font Awesome in Vue and Nuxt is basically the same. Nuxt is built on top of Vue, so what works in Vue will work in Nuxt as well.</p>
+<p>Most of Nuxt’s settings can be found in the <code>~/nuxt.config.ts</code> file. To register Font Awesome’s CSS file, navigate to the CSS section or add the following:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">css: [</span><br><span class="line">    &quot;@fortawesome/fontawesome-svg-core/styles.css&quot;,</span><br><span class="line">    /*** other CSS libraries ***/</span><br><span class="line">],</span><br></pre></td></tr></table></figure>
+
+<p>Using Font Awesome in Vue Components is the same as in VueJS project: <code>&lt;font-awesome-icon :icon=&quot;[&#39;fab&#39;, &#39;twitter-square&#39;]&quot; /&gt;</code>.</p>
+<hr>
+<h2 id="Internationalization"><a href="#Internationalization" class="headerlink" title="Internationalization"></a>Internationalization</h2><p>As a bilingual person, adding multi-language functionality is always an essnetial aspect of software development, particularly in web applications. Over the years, Multiple languages has become quite standardized by using i18n, regardless of the environment used.</p>
+<p>To install i18n in Nuxt v3, run installation with yarn or npm, or add the following in <code>package.json</code>:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&quot;@nuxtjs/i18n&quot;: &quot;^8.0.0-beta.10&quot;</span><br></pre></td></tr></table></figure>
+
+<p>Similar to Font Awesome, i18n configuration is added in <code>nuxt.config.ts</code>. Instead of storing all language data inside the nuxt.config.ts file, it’s cleaner and more organized to use multiple JSON or YAML files to store each language separately. These language files can be placed anywhere within the code repository. For the purpose of clarity, let’s assume that a directory called <code>~/locales</code> has been created under the root of the code repo.</p>
+<p>At the top of the <code>nuxt.config.ts</code> file, add:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">import en from &quot;./locales/en.json&quot;;</span><br><span class="line">import fr from &quot;./locales/fr.json&quot;;</span><br><span class="line">import zh from &quot;./locales/zh.json&quot;;</span><br></pre></td></tr></table></figure>
+
+<p>Find or create the <strong>modules</strong> section in the <code>nuxt.config.ts</code> file:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">modules: [</span><br><span class="line">  &quot;@nuxtjs/i18n&quot;</span><br><span class="line">],</span><br></pre></td></tr></table></figure>
+
+<p>Since i18n has a community module in the Nuxt v3 ecosystem, there is no need to create a new plugin.</p>
+<p>To configure i18n, add a new section inside the <code>nuxt.config.ts</code> file:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">i18n: &#123;</span><br><span class="line">  locales: [</span><br><span class="line">    &#123; code: &quot;en&quot;, name: &quot;English&quot; &#125;,</span><br><span class="line">    &#123; code: &quot;en&quot;, name: &quot;langue français&quot; &#125;</span><br><span class="line">    &#123; code: &quot;zh&quot;, name: &quot;中文&quot; &#125;,</span><br><span class="line">  ],</span><br><span class="line">  defaultLocale: &quot;en&quot;,</span><br><span class="line">  vueI18n: &#123;</span><br><span class="line">    fallbackLocale: &quot;en&quot;,</span><br><span class="line">    messages: &#123;</span><br><span class="line">      en,</span><br><span class="line">      fr,</span><br><span class="line">      zh,</span><br><span class="line">    &#125;,</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>The objects <code>en</code>, <code>fr</code>, and <code>zh</code> are imported from the JSON files. The locales array allows developers to retrieve the list of all supported languages in the project from any component.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div class=&quot;navbar-dropdown is-right&quot;&gt;</span><br><span class="line">    &lt;a v-for=&quot;l in locales&quot; :key=&quot;l.code&quot; class=&quot;navbar-item&quot;&gt;</span><br><span class="line">      &#123;&#123; l.name &#125;&#125;</span><br><span class="line">    &lt;/a&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script lang=&quot;ts&quot;&gt;</span><br><span class="line">  export default &#123;</span><br><span class="line">    computed: &#123;</span><br><span class="line">      locales(): LocaleObject[] &#123;</span><br><span class="line">        return this.$i18n.locales</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+
+<p>Lastly, the default language of this project is English since defaultLocale is set to “en”.</p>
+
+            
+
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">TAGGED IN</span><br/>
+                
+    <a class="tag tag--primary tag--small t-none-link" href="/tags/JavaScript/" rel="tag">JavaScript</a> <a class="tag tag--primary tag--small t-none-link" href="/tags/Nuxt/" rel="tag">Nuxt</a> <a class="tag tag--primary tag--small t-none-link" href="/tags/TypeScript/" rel="tag">TypeScript</a> <a class="tag tag--primary tag--small t-none-link" href="/tags/Vue/" rel="tag">Vue</a>
+
+            </div>
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a
+                        class="post-action-btn btn btn--disabled"
+                        aria-hidden="true"
+                    >
+                        
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/10/15/OpenHPC-Generate-Job-Data-Report/"
+                    data-tooltip="OpenHPC Generate Job Data Report"
+                    aria-label="NEXT: OpenHPC Generate Job Data Report"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=http://example.com/2023/04/19/nuxt-v3-introduction/"
+                    title="Share on Facebook"
+                    aria-label="Share on Facebook"
+                >
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://twitter.com/intent/tweet?text=http://example.com/2023/04/19/nuxt-v3-introduction/"
+                    title="Share on Twitter"
+                    aria-label="Share on Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://plus.google.com/share?url=http://example.com/2023/04/19/nuxt-v3-introduction/"
+                    title="Share on Google+"
+                    aria-label="Share on Google+"
+                >
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.linkedin.com/shareArticle?mini=true&amp;url=http://example.com/2023/04/19/nuxt-v3-introduction/"
+                    title="global.share_on_linkedin"
+                    aria-label="global.share_on_linkedin"
+                >
+                    <i class="fab fa-linkedin" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#gitalk"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="gitalk"></div>
+
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2023 Outraverse. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a
+                        class="post-action-btn btn btn--disabled"
+                        aria-hidden="true"
+                    >
+                        
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2022/10/15/OpenHPC-Generate-Job-Data-Report/"
+                    data-tooltip="OpenHPC Generate Job Data Report"
+                    aria-label="NEXT: OpenHPC Generate Job Data Report"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=http://example.com/2023/04/19/nuxt-v3-introduction/"
+                    title="Share on Facebook"
+                    aria-label="Share on Facebook"
+                >
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://twitter.com/intent/tweet?text=http://example.com/2023/04/19/nuxt-v3-introduction/"
+                    title="Share on Twitter"
+                    aria-label="Share on Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://plus.google.com/share?url=http://example.com/2023/04/19/nuxt-v3-introduction/"
+                    title="Share on Google+"
+                    aria-label="Share on Google+"
+                >
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.linkedin.com/shareArticle?mini=true&amp;url=http://example.com/2023/04/19/nuxt-v3-introduction/"
+                    title="global.share_on_linkedin"
+                    aria-label="global.share_on_linkedin"
+                >
+                    <i class="fab fa-linkedin" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a
+                        class="post-action-btn btn btn--default"
+                        href="#gitalk"
+                        aria-label="Leave a comment"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href="https://www.facebook.com/sharer/sharer.php?u=http://example.com/2023/04/19/nuxt-v3-introduction/"
+                        aria-label="Share on Facebook"
+                    >
+                        <i class="fab fa-facebook" aria-hidden="true"></i><span>Share on Facebook</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href="https://twitter.com/intent/tweet?text=http://example.com/2023/04/19/nuxt-v3-introduction/"
+                        aria-label="Share on Twitter"
+                    >
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href="https://plus.google.com/share?url=http://example.com/2023/04/19/nuxt-v3-introduction/"
+                        aria-label="Share on Google+"
+                    >
+                        <i class="fab fa-google-plus" aria-hidden="true"></i><span>Share on Google+</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href="https://www.linkedin.com/shareArticle?mini=true&amp;url=http://example.com/2023/04/19/nuxt-v3-introduction/"
+                        aria-label="global.share_on_linkedin"
+                    >
+                        <i class="fab fa-linkedin" aria-hidden="true"></i><span>global.share_on_linkedin</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
+
+
+            
+        </div>
+        
+
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <h4 id="about-card-name">Outraverse</h4>
+        
+            <div id="about-card-bio"><p>I Manage Outraverse</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                <p>IT Program Manager</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br/>
+                Colorado
+            </div>
+        
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+
+<script src="/assets/js/script-yhrbpfyodwxrwpr2lbsf6ajykfdkjircaq0t3vfbpqzztl0ns5fe9j0dv9em.min.js"></script>
+
+<!--SCRIPTS END-->
+
+
+    
+        
+<script src="/assets/js/gitalk.js"></script>
+
+        <script type="text/javascript">
+          (function() {
+            new Gitalk({
+              clientID: 'f0b90513862af7a23286',
+              clientSecret: '4c2c3ec636dccc646efa4ba3350bc4baa1c75706',
+              repo: 'io.blog-comments',
+              owner: 'outraverse',
+              admin: ['outraverse'],
+              id: '2023/04/19/nuxt-v3-introduction/',
+              ...{"language":"en","perPage":10,"distractionFreeMode":false,"enableHotKey":true,"pagerDirection":"first"}
+            }).render('gitalk')
+          })()
+        </script>
+    
+
+
+
+
+    </body>
+</html>

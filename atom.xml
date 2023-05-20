@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2023-05-20T22:42:58.868Z</updated>
+  <updated>2023-05-20T22:50:49.752Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -17,15 +17,26 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
-    <title>read command line output with python</title>
-    <link href="http://example.com/2023/05/20/read-command-line-output-with-python/"/>
-    <id>http://example.com/2023/05/20/read-command-line-output-with-python/</id>
-    <published>2023-05-20T22:42:58.000Z</published>
-    <updated>2023-05-20T22:42:58.868Z</updated>
+    <title>Read Command Line Output with Python</title>
+    <link href="http://example.com/2023/05/10/read-command-line-output-with-python/"/>
+    <id>http://example.com/2023/05/10/read-command-line-output-with-python/</id>
+    <published>2023-05-10T19:06:18.000Z</published>
+    <updated>2023-05-20T22:50:49.752Z</updated>
+    
+    <content type="html"><![CDATA[<p>Python is a versatile and powerful programming language known for its simplicity and readability. It gaines immense popularity among developers, data scientists, and system administrators due to its wide range of applications and extensive libraries.</p><p>In the realm of Information Technology Operations (IT Ops), Python has become an invaluable tool for managing and automating various tasks.</p><span id="more"></span><p>Here is a basic task which Python can be used to collect data from command line output of a softare program.</p><hr><p>A use case I am going to present is the command line output from the screenshot below. It is from a program called NoMachine. NoMachine is a remote desktop software solution that allows users to access and control a remote computer or server from a local machine over a network. NX Server, which runs NoMachine services, is a great solution for managing remote desktop connections on a Linux environment.</p><p><img src="/2023/05/10/read-command-line-output-with-python/nxserver-output.png"></p><p>The screenshot shows a typical nxserver command, <code>nxserver --list</code> that lists all users with active sessions. We can see the output contains 5 columns: Display, Username, Remote IP, Session ID and Node.</p><p>It looks like we can somehow store these data into an array.</p><p>Python has  is a built-in library module called <code>subprocess</code> that provides a way to spawn new processes, interact with them, and manage input&#x2F;output streams. It serves as a bridge between Python programs and the operating system’s process management capabilities.</p><p>We can utilize this library to retrieve the output from <code>nxserver</code>, and store the output in an array.</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">import subprocess</span><br><span class="line">import json</span><br><span class="line"></span><br><span class="line"># Run the &quot;nxserver --list&quot; command and capture its output</span><br><span class="line">output = subprocess.check_output([&quot;/usr/NX/bin/nxserver&quot;, &quot;--list&quot;])</span><br><span class="line">#print(output)</span><br><span class="line"></span><br><span class="line"># Convert the output to a string</span><br><span class="line">output_str = output.decode(&quot;utf-8&quot;)</span><br><span class="line"></span><br><span class="line"># Split the output into lines</span><br><span class="line">lines = output_str.split(&quot;\n&quot;)</span><br><span class="line"></span><br><span class="line"># create a list to hold the session information</span><br><span class="line">sessions = []</span><br><span class="line"></span><br><span class="line"># Loop through the lines and print the information for each server</span><br><span class="line">for line in lines:</span><br><span class="line">    if line.startswith(&quot;NX&gt;&quot;):  # Skip any informational lines that start with &quot;NX&gt;&quot;</span><br><span class="line">      continue</span><br><span class="line">    if line.startswith(&quot;Display&quot;) :</span><br><span class="line">      continue</span><br><span class="line">    if line.startswith(&quot;---&quot;) :</span><br><span class="line">      continue</span><br><span class="line">    #print(line)</span><br><span class="line">    cols = line.split()</span><br><span class="line">    #if len(cols) &gt; 4 and cols[2] == &quot;-&quot; :  # Check that the line has the expected number of columns</span><br><span class="line">    if len(cols) &gt; 4 :  # Check that the line has the expected number of columns</span><br><span class="line">      sessions.append(&#123;&quot;session&quot;: cols[0], &quot;user&quot;: cols[1], &quot;ip&quot;: cols[2]&#125;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># save sessions into a JSON file</span><br><span class="line">with open(&quot;/user/nxserver-cleanup/sessions.json&quot;, &quot;w&quot;) as f :json.dump(sessions, f)</span><br></pre></td></tr></table></figure><p>The code example above capture the output from <code>nxserver --list</code>, split each lines from the output, skip lines begin with <code>NX&gt;</code>, <code>Display</code> and <code>---</code>. Split the each line again by spaces.</p><p>Users and their session information are store in an array once the for loop has executed.</p><p>The last step is to save the array into a JSON file.</p><hr><p>Easy enough. </p><p>Now create an API on the server to expose the JSON file or utilize any backend programming languages that can authenticate with SSH protocol to grab this JSON file for display.</p>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;Python is a versatile and powerful programming language known for its simplicity and readability. It gaines immense popularity among developers, data scientists, and system administrators due to its wide range of applications and extensive libraries.&lt;/p&gt;
+&lt;p&gt;In the realm of Information Technology Operations (IT Ops), Python has become an invaluable tool for managing and automating various tasks.&lt;/p&gt;</summary>
     
     
     
+    <category term="IT Operation" scheme="http://example.com/categories/IT-Operation/"/>
     
+    
+    <category term="Python" scheme="http://example.com/tags/Python/"/>
+    
+    <category term="Ops" scheme="http://example.com/tags/Ops/"/>
     
   </entry>
   

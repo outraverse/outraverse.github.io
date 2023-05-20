@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="Outraverse">
-    <title>read command line output with python - Outraverse</title>
+    <title>Read Command Line Output with Python - Outraverse</title>
     <meta name="author" content="Outraverse">
     
     
@@ -15,24 +15,34 @@
             <link rel="alternate" type="application/atom+xml" title="RSS" href="/atom.xml">
         
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Outraverse","sameAs":["https://github.com/outraverse"]},"articleBody":"","dateCreated":"2023-05-20T16:42:58-06:00","dateModified":"2023-05-20T16:42:58-06:00","datePublished":"2023-05-20T16:42:58-06:00","description":"","headline":"read command line output with python","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"http://example.com/2023/05/20/read-command-line-output-with-python/"},"publisher":{"@type":"Organization","name":"Outraverse","sameAs":["https://github.com/outraverse"]},"url":"http://example.com/2023/05/20/read-command-line-output-with-python/"}</script>
-    <meta name="description" content="This is the blog site of Outraverse">
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Outraverse","sameAs":["https://github.com/outraverse"]},"articleBody":"Python is a versatile and powerful programming language known for its simplicity and readability. It gaines immense popularity among developers, data scientists, and system administrators due to its wide range of applications and extensive libraries.\nIn the realm of Information Technology Operations (IT Ops), Python has become an invaluable tool for managing and automating various tasks.\n\n\nHere is a basic task which Python can be used to collect data from command line output of a softare program.\n\nA use case I am going to present is the command line output from the screenshot below. It is from a program called NoMachine. NoMachine is a remote desktop software solution that allows users to access and control a remote computer or server from a local machine over a network. NX Server, which runs NoMachine services, is a great solution for managing remote desktop connections on a Linux environment.\n\nThe screenshot shows a typical nxserver command, nxserver --list that lists all users with active sessions. We can see the output contains 5 columns: Display, Username, Remote IP, Session ID and Node.\nIt looks like we can somehow store these data into an array.\nPython has  is a built-in library module called subprocess that provides a way to spawn new processes, interact with them, and manage input&#x2F;output streams. It serves as a bridge between Python programs and the operating system’s process management capabilities.\nWe can utilize this library to retrieve the output from nxserver, and store the output in an array.\n123456789101112131415161718192021222324252627282930313233import subprocessimport json# Run the &quot;nxserver --list&quot; command and capture its outputoutput = subprocess.check_output([&quot;/usr/NX/bin/nxserver&quot;, &quot;--list&quot;])#print(output)# Convert the output to a stringoutput_str = output.decode(&quot;utf-8&quot;)# Split the output into lineslines = output_str.split(&quot;\\n&quot;)# create a list to hold the session informationsessions = []# Loop through the lines and print the information for each serverfor line in lines:    if line.startswith(&quot;NX&gt;&quot;):  # Skip any informational lines that start with &quot;NX&gt;&quot;      continue    if line.startswith(&quot;Display&quot;) :      continue    if line.startswith(&quot;---&quot;) :      continue    #print(line)    cols = line.split()    #if len(cols) &gt; 4 and cols[2] == &quot;-&quot; :  # Check that the line has the expected number of columns    if len(cols) &gt; 4 :  # Check that the line has the expected number of columns      sessions.append(&#123;&quot;session&quot;: cols[0], &quot;user&quot;: cols[1], &quot;ip&quot;: cols[2]&#125;)# save sessions into a JSON filewith open(&quot;/user/nxserver-cleanup/sessions.json&quot;, &quot;w&quot;) as f :json.dump(sessions, f)\n\nThe code example above capture the output from nxserver --list, split each lines from the output, skip lines begin with NX&gt;, Display and ---. Split the each line again by spaces.\nUsers and their session information are store in an array once the for loop has executed.\nThe last step is to save the array into a JSON file.\n\nEasy enough. \nNow create an API on the server to expose the JSON file or utilize any backend programming languages that can authenticate with SSH protocol to grab this JSON file for display.\n","dateCreated":"2023-05-10T13:06:18-06:00","dateModified":"2023-05-20T16:50:49-06:00","datePublished":"2023-05-10T13:06:18-06:00","description":"Python is a versatile and powerful programming language known for its simplicity and readability. It gaines immense popularity among developers, data scientists, and system administrators due to its wide range of applications and extensive libraries.\nIn the realm of Information Technology Operations (IT Ops), Python has become an invaluable tool for managing and automating various tasks.","headline":"Read Command Line Output with Python","image":["https://images.pexels.com/photos/1181671/pexels-photo-1181671.jpeg","https://images.pexels.com/photos/1181671/pexels-photo-1181671.jpeg"],"mainEntityOfPage":{"@type":"WebPage","@id":"http://example.com/2023/05/10/read-command-line-output-with-python/"},"publisher":{"@type":"Organization","name":"Outraverse","sameAs":["https://github.com/outraverse"]},"url":"http://example.com/2023/05/10/read-command-line-output-with-python/","keywords":"Python, Ops","thumbnailUrl":"https://images.pexels.com/photos/1181671/pexels-photo-1181671.jpeg"}</script>
+    <meta name="description" content="Python is a versatile and powerful programming language known for its simplicity and readability. It gaines immense popularity among developers, data scientists, and system administrators due to its w">
 <meta property="og:type" content="blog">
-<meta property="og:title" content="read command line output with python">
-<meta property="og:url" content="http://example.com/2023/05/20/read-command-line-output-with-python/index.html">
+<meta property="og:title" content="Read Command Line Output with Python">
+<meta property="og:url" content="http://example.com/2023/05/10/read-command-line-output-with-python/index.html">
 <meta property="og:site_name" content="Outraverse">
-<meta property="og:description" content="This is the blog site of Outraverse">
+<meta property="og:description" content="Python is a versatile and powerful programming language known for its simplicity and readability. It gaines immense popularity among developers, data scientists, and system administrators due to its w">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2023-05-20T22:42:58.000Z">
-<meta property="article:modified_time" content="2023-05-20T22:42:58.868Z">
+<meta property="og:image" content="http://example.com/2023/05/10/read-command-line-output-with-python/nxserver-output.png">
+<meta property="article:published_time" content="2023-05-10T19:06:18.000Z">
+<meta property="article:modified_time" content="2023-05-20T22:50:49.752Z">
 <meta property="article:author" content="Outraverse">
+<meta property="article:tag" content="Python">
+<meta property="article:tag" content="Ops">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/2023/05/10/read-command-line-output-with-python/nxserver-output.png">
     
     
         
     
     
     
+        <meta property="og:image" content="https://images.pexels.com/photos/1181671/pexels-photo-1181671.jpeg"/>
+        <meta class="swiftype" name="image" data-type="enum" content="https://images.pexels.com/photos/1181671/pexels-photo-1181671.jpeg"/>
+    
+    
+        <meta property="og:image" content="https://images.pexels.com/photos/1181671/pexels-photo-1181671.jpeg"/>
+        <meta class="swiftype" name="image" data-type="enum" content="https://images.pexels.com/photos/1181671/pexels-photo-1181671.jpeg"/>
     
     
     <!--STYLES-->
@@ -216,43 +226,86 @@
 </nav>
 
             
-            <div id="main" data-behavior="4"
-                 class="
-                        hasCoverMetaIn
-                        ">
-                
-<article class="post">
-    
-    
-        <div class="post-header main-content-wrap text-left">
+        <div class="post-header-cover
+                    text-center
+                    post-header-cover--partial"
+             style="background-image:url('https://images.pexels.com/photos/1181671/pexels-photo-1181671.jpeg');"
+             data-behavior="4">
+            
+                <div class="post-header main-content-wrap text-center">
     
         <h1 class="post-title">
-            read command line output with python
+            Read Command Line Output with Python
         </h1>
     
     
         <div class="post-meta">
-    <time datetime="2023-05-20T16:42:58-06:00">
+    <time datetime="2023-05-10T13:06:18-06:00">
 	
-		    May 20, 2023
+		    May 10, 2023
     	
     </time>
     
+        <span>in </span>
+        
+    <a class="category-link" href="/categories/IT-Operation/">IT Operation</a>
+
+
+    
 </div>
 
     
 </div>
 
+            
+        </div>
+
+            <div id="main" data-behavior="4"
+                 class="hasCover
+                        hasCoverMetaIn
+                        hasCoverCaption">
+                
+<article class="post">
+    
+        <span class="post-header-cover-caption caption">Python Library Subprocess to store data from command line ouput</span>
+    
     
     <div class="post-content markdown">
         <div class="main-content-wrap">
-            
+            <p>Python is a versatile and powerful programming language known for its simplicity and readability. It gaines immense popularity among developers, data scientists, and system administrators due to its wide range of applications and extensive libraries.</p>
+<p>In the realm of Information Technology Operations (IT Ops), Python has become an invaluable tool for managing and automating various tasks.</p>
+<span id="more"></span>
+
+<p>Here is a basic task which Python can be used to collect data from command line output of a softare program.</p>
+<hr>
+<p>A use case I am going to present is the command line output from the screenshot below. It is from a program called NoMachine. NoMachine is a remote desktop software solution that allows users to access and control a remote computer or server from a local machine over a network. NX Server, which runs NoMachine services, is a great solution for managing remote desktop connections on a Linux environment.</p>
+<p><img src="/2023/05/10/read-command-line-output-with-python/nxserver-output.png"></p>
+<p>The screenshot shows a typical nxserver command, <code>nxserver --list</code> that lists all users with active sessions. We can see the output contains 5 columns: Display, Username, Remote IP, Session ID and Node.</p>
+<p>It looks like we can somehow store these data into an array.</p>
+<p>Python has  is a built-in library module called <code>subprocess</code> that provides a way to spawn new processes, interact with them, and manage input&#x2F;output streams. It serves as a bridge between Python programs and the operating system’s process management capabilities.</p>
+<p>We can utilize this library to retrieve the output from <code>nxserver</code>, and store the output in an array.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">import subprocess</span><br><span class="line">import json</span><br><span class="line"></span><br><span class="line"># Run the &quot;nxserver --list&quot; command and capture its output</span><br><span class="line">output = subprocess.check_output([&quot;/usr/NX/bin/nxserver&quot;, &quot;--list&quot;])</span><br><span class="line">#print(output)</span><br><span class="line"></span><br><span class="line"># Convert the output to a string</span><br><span class="line">output_str = output.decode(&quot;utf-8&quot;)</span><br><span class="line"></span><br><span class="line"># Split the output into lines</span><br><span class="line">lines = output_str.split(&quot;\n&quot;)</span><br><span class="line"></span><br><span class="line"># create a list to hold the session information</span><br><span class="line">sessions = []</span><br><span class="line"></span><br><span class="line"># Loop through the lines and print the information for each server</span><br><span class="line">for line in lines:</span><br><span class="line">    if line.startswith(&quot;NX&gt;&quot;):  # Skip any informational lines that start with &quot;NX&gt;&quot;</span><br><span class="line">      continue</span><br><span class="line">    if line.startswith(&quot;Display&quot;) :</span><br><span class="line">      continue</span><br><span class="line">    if line.startswith(&quot;---&quot;) :</span><br><span class="line">      continue</span><br><span class="line">    #print(line)</span><br><span class="line">    cols = line.split()</span><br><span class="line">    #if len(cols) &gt; 4 and cols[2] == &quot;-&quot; :  # Check that the line has the expected number of columns</span><br><span class="line">    if len(cols) &gt; 4 :  # Check that the line has the expected number of columns</span><br><span class="line">      sessions.append(&#123;&quot;session&quot;: cols[0], &quot;user&quot;: cols[1], &quot;ip&quot;: cols[2]&#125;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># save sessions into a JSON file</span><br><span class="line">with open(&quot;/user/nxserver-cleanup/sessions.json&quot;, &quot;w&quot;) as f :json.dump(sessions, f)</span><br></pre></td></tr></table></figure>
+
+<p>The code example above capture the output from <code>nxserver --list</code>, split each lines from the output, skip lines begin with <code>NX&gt;</code>, <code>Display</code> and <code>---</code>. Split the each line again by spaces.</p>
+<p>Users and their session information are store in an array once the for loop has executed.</p>
+<p>The last step is to save the array into a JSON file.</p>
+<hr>
+<p>Easy enough. </p>
+<p>Now create an API on the server to expose the JSON file or utilize any backend programming languages that can authenticate with SSH protocol to grab this JSON file for display.</p>
+
             
 
 
         </div>
     </div>
     <div id="post-footer" class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">TAGGED IN</span><br/>
+                
+    <a class="tag tag--primary tag--small t-none-link" href="/tags/Ops/" rel="tag">Ops</a> <a class="tag tag--primary tag--small t-none-link" href="/tags/Python/" rel="tag">Python</a>
+
+            </div>
         
         
             <div class="post-actions-wrap">
@@ -301,7 +354,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=http://example.com/2023/05/20/read-command-line-output-with-python/"
+                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=http://example.com/2023/05/10/read-command-line-output-with-python/"
                     title="Share on Facebook"
                     aria-label="Share on Facebook"
                 >
@@ -314,7 +367,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://twitter.com/intent/tweet?text=http://example.com/2023/05/20/read-command-line-output-with-python/"
+                    target="new" href="https://twitter.com/intent/tweet?text=http://example.com/2023/05/10/read-command-line-output-with-python/"
                     title="Share on Twitter"
                     aria-label="Share on Twitter"
                 >
@@ -327,7 +380,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://plus.google.com/share?url=http://example.com/2023/05/20/read-command-line-output-with-python/"
+                    target="new" href="https://plus.google.com/share?url=http://example.com/2023/05/10/read-command-line-output-with-python/"
                     title="Share on Google+"
                     aria-label="Share on Google+"
                 >
@@ -340,7 +393,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://www.linkedin.com/shareArticle?mini=true&amp;url=http://example.com/2023/05/20/read-command-line-output-with-python/"
+                    target="new" href="https://www.linkedin.com/shareArticle?mini=true&amp;url=http://example.com/2023/05/10/read-command-line-output-with-python/"
                     title="global.share_on_linkedin"
                     aria-label="global.share_on_linkedin"
                 >
@@ -439,7 +492,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=http://example.com/2023/05/20/read-command-line-output-with-python/"
+                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=http://example.com/2023/05/10/read-command-line-output-with-python/"
                     title="Share on Facebook"
                     aria-label="Share on Facebook"
                 >
@@ -452,7 +505,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://twitter.com/intent/tweet?text=http://example.com/2023/05/20/read-command-line-output-with-python/"
+                    target="new" href="https://twitter.com/intent/tweet?text=http://example.com/2023/05/10/read-command-line-output-with-python/"
                     title="Share on Twitter"
                     aria-label="Share on Twitter"
                 >
@@ -465,7 +518,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://plus.google.com/share?url=http://example.com/2023/05/20/read-command-line-output-with-python/"
+                    target="new" href="https://plus.google.com/share?url=http://example.com/2023/05/10/read-command-line-output-with-python/"
                     title="Share on Google+"
                     aria-label="Share on Google+"
                 >
@@ -478,7 +531,7 @@
             <li class="post-action hide-xs">
                 <a
                     class="post-action-btn btn btn--default"
-                    target="new" href="https://www.linkedin.com/shareArticle?mini=true&amp;url=http://example.com/2023/05/20/read-command-line-output-with-python/"
+                    target="new" href="https://www.linkedin.com/shareArticle?mini=true&amp;url=http://example.com/2023/05/10/read-command-line-output-with-python/"
                     title="global.share_on_linkedin"
                     aria-label="global.share_on_linkedin"
                 >
@@ -522,7 +575,7 @@
                     <a
                         class="share-option-btn"
                         target="new"
-                        href="https://www.facebook.com/sharer/sharer.php?u=http://example.com/2023/05/20/read-command-line-output-with-python/"
+                        href="https://www.facebook.com/sharer/sharer.php?u=http://example.com/2023/05/10/read-command-line-output-with-python/"
                         aria-label="Share on Facebook"
                     >
                         <i class="fab fa-facebook" aria-hidden="true"></i><span>Share on Facebook</span>
@@ -535,7 +588,7 @@
                     <a
                         class="share-option-btn"
                         target="new"
-                        href="https://twitter.com/intent/tweet?text=http://example.com/2023/05/20/read-command-line-output-with-python/"
+                        href="https://twitter.com/intent/tweet?text=http://example.com/2023/05/10/read-command-line-output-with-python/"
                         aria-label="Share on Twitter"
                     >
                         <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
@@ -548,7 +601,7 @@
                     <a
                         class="share-option-btn"
                         target="new"
-                        href="https://plus.google.com/share?url=http://example.com/2023/05/20/read-command-line-output-with-python/"
+                        href="https://plus.google.com/share?url=http://example.com/2023/05/10/read-command-line-output-with-python/"
                         aria-label="Share on Google+"
                     >
                         <i class="fab fa-google-plus" aria-hidden="true"></i><span>Share on Google+</span>
@@ -561,7 +614,7 @@
                     <a
                         class="share-option-btn"
                         target="new"
-                        href="https://www.linkedin.com/shareArticle?mini=true&amp;url=http://example.com/2023/05/20/read-command-line-output-with-python/"
+                        href="https://www.linkedin.com/shareArticle?mini=true&amp;url=http://example.com/2023/05/10/read-command-line-output-with-python/"
                         aria-label="global.share_on_linkedin"
                     >
                         <i class="fab fa-linkedin" aria-hidden="true"></i><span>global.share_on_linkedin</span>
@@ -628,7 +681,7 @@
               repo: 'io.blog-comments',
               owner: 'outraverse',
               admin: ['outraverse'],
-              id: '2023/05/20/read-command-line-output-with-python/',
+              id: '2023/05/10/read-command-line-output-with-python/',
               ...{"language":"en","perPage":10,"distractionFreeMode":false,"enableHotKey":true,"pagerDirection":"first"}
             }).render('gitalk')
           })()

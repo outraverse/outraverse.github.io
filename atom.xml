@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2023-04-22T15:43:27.920Z</updated>
+  <updated>2023-05-20T22:42:58.868Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -15,6 +15,19 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>read command line output with python</title>
+    <link href="http://example.com/2023/05/20/read-command-line-output-with-python/"/>
+    <id>http://example.com/2023/05/20/read-command-line-output-with-python/</id>
+    <published>2023-05-20T22:42:58.000Z</published>
+    <updated>2023-05-20T22:42:58.868Z</updated>
+    
+    
+    
+    
+    
+  </entry>
   
   <entry>
     <title>Nuxt v3, Introduction</title>
